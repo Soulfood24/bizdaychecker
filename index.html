@@ -4,7 +4,54 @@
   <title>Biz Day Checker</title>
 </head>
 <body>
-  <h1>Biz Day Checker</h1>
-  <p>Site is live.</p>
+ <h1>Business Day Checker</h1>
+
+<p>Enter a start date and number of business days.</p>
+
+<label>
+  Start date:
+  <input type="date" id="startDate">
+</label>
+
+<br><br>
+
+<label>
+  Business days to add:
+  <input type="number" id="daysToAdd" value="1">
+</label>
+
+<br><br>
+
+<button onclick="calculate()">Calculate</button>
+
+<p id="result"></p>
+
+<script>
+function calculate() {
+  const startInput = document.getElementById("startDate").value;
+  const daysToAdd = parseInt(document.getElementById("daysToAdd").value, 10);
+
+  if (!startInput || isNaN(daysToAdd)) {
+    document.getElementById("result").textContent = "Please enter valid inputs.";
+    return;
+  }
+
+  let date = new Date(startInput);
+  let added = 0;
+
+  while (added < daysToAdd) {
+    date.setDate(date.getDate() + 1);
+    const day = date.getDay();
+    if (day !== 0 && day !== 6) {
+      added++;
+    }
+  }
+
+  document.getElementById("result").textContent =
+    "Resulting date: " + date.toDateString();
+}
+</script> 
+  
 </body>
+</html>
 </html>
