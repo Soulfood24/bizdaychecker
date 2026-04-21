@@ -258,3 +258,21 @@ function toISO(d) {
 
             document.getElementById("year").textContent =
                 new Date().getFullYear();
+
+            // Update remaining business days counter
+            (function updateBizRemaining() {
+                var el = document.getElementById("bizRemaining");
+                if (!el) return;
+                var now = new Date(); now.setHours(0,0,0,0);
+                var year = now.getFullYear();
+                var end = new Date(year, 11, 31);
+                var start = new Date(year, 0, 1);
+                var hol = buildHolidaySet(start, end);
+                var count = 0;
+                var cur = new Date(now);
+                while (cur <= end) {
+                    if (!isWeekend(cur) && !hol.has(toISO(cur))) count++;
+                    cur = addDays(cur, 1);
+                }
+                el.textContent = count;
+            })();
