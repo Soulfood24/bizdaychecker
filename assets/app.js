@@ -11,6 +11,10 @@ function toISO(d) {
                 return d.getDay() == 0 || d.getDay() == 6;
             }
 
+            function isValidDate(d) {
+                return d instanceof Date && !isNaN(d.getTime());
+            }
+
             function usHolidays(year) {
                 function obs(d) {
                     let x = new Date(d.getTime());
@@ -85,87 +89,158 @@ function toISO(d) {
                 return hol;
             }
 
+            var MAX_DAYS = 10000;
+            var DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
             function calculate() {
                 let include = document.getElementById("includeStart").checked;
-                let custom = new Set(
-                    document
-                        .getElementById("customHolidays")
-                        .value.split("\n")
-                        .map((x) => x.trim())
-                        .filter((x) => x),
-                );
+                let rawCustom = document
+                    .getElementById("customHolidays")
+                    .value.split("\n")
+                    .map((x) => x.trim())
+                    .filter((x) => x);
+                var customWarnings = [];
+                let custom = new Set();
+                rawCustom.forEach(function (entry) {
+                    if (DATE_RE.test(entry) && isValidDate(new Date(entry + "T00:00:00"))) {
+                        custom.add(entry);
+                    } else {
+                        customWarnings.push('Invalid format: "' + entry + '" (use YYYY-MM-DD)');
+                    }
+                });
 
                 // Determine date range for holiday generation
                 let mode = document.getElementById("mode").value;
-                let rangeStart, rangeEnd;
-                if (mode == "add") {
-                    rangeStart = new Date(
-                        document.getElementById("startDate").value,
-                    );
-                    let n =
-                        parseInt(
-                            document.getElementById("daysToAdd").value,
-                            10,
-                        ) || 0;
-                    rangeEnd = addDays(rangeStart, Math.max(n * 2, 365)); // buffer
-                } else {
-                    rangeStart = new Date(
-                        document.getElementById("betweenStart").value,
-                    );
-                    rangeEnd = new Date(
-                        document.getElementById("betweenEnd").value,
-                    );
-                }
+                let resultEl = document.getElementById("result");
+                var rangeStart, rangeEnd;
 
-                let hol = buildHolidaySet(rangeStart, rangeEnd);
-                function isBiz(d) {
-                    return (
-                        !isWeekend(d) &&
-                        !hol.has(toISO(d)) &&
-                        !custom.has(toISO(d))
-                    );
-                }
-                let out = "";
                 if (mode === "add") {
-                    let s = new Date(
-                        document.getElementById("startDate").value,
-                    );
-                    let n = parseInt(
-                        document.getElementById("daysToAdd").value,
-                        10,
-                    );
-                    let cur = new Date(s);
-                    let count = 0;
-                    if (include && isBiz(cur)) count = 1;
-                    else cur = addDays(cur, 1);
+                    var startInput = document.getElementById("startDate").value;
+                    var daysInput = document.getElementById("daysToAdd").value;
+
+                    // Validation: empty date
+                    if (!startInput) {
+                        resultEl.innerText = "Please enter a start date.";
+                        return;
+                    }
+                    var s = new Date(startInput);
+                    if (!isValidDate(s)) {
+                        resultEl.innerText = "Invalid start date.";
+                        return;
+                    }
+
+                    // Validation: empty days
+                    if (daysInput.trim() === "") {
+                        resultEl.innerText = "Please enter the number of business days.";
+                        return;
+                    }
+
+                    var n = parseInt(daysInput, 10);
+
+                    // Validation: non-numeric
+                    if (isNaN(n)) {
+                        resultEl.innerText = "Business days must be a number.";
+                        return;
+                    }
+
+                    // Validation: negative
+                    if (n < 0) {
+                        resultEl.innerText = "Business days cannot be negative.";
+                        return;
+                    }
+
+                    // Validation: zero
+                    if (n === 0) {
+                        resultEl.innerText = "Enter at least 1 business day.";
+                        return;
+                    }
+
+                    // Validation: too large
+                    if (n > MAX_DAYS) {
+                        resultEl.innerText = "Maximum is " + MAX_DAYS.toLocaleString() + " business days.";
+                        return;
+                    }
+
+                    rangeStart = s;
+                    rangeEnd = addDays(rangeStart, Math.max(n * 2, 365));
+
+                    let hol = buildHolidaySet(rangeStart, rangeEnd);
+                    function isBiz(d) {
+                        return (
+                            !isWeekend(d) &&
+                            !hol.has(toISO(d)) &&
+                            !custom.has(toISO(d))
+                        );
+                    }
+
+                    var cur = new Date(s);
+                    var count = 0;
+
+                    if (include && isBiz(cur)) {
+                        // Start date counts as Day 1 — result should be start date when n=1
+                        count = 1;
+                        if (n > 1) cur = addDays(cur, 1); // advance only if we need more days
+                    } else {
+                        cur = addDays(cur, 1);
+                    }
+
                     while (count < n) {
                         if (isBiz(cur)) count++;
                         if (count < n) cur = addDays(cur, 1);
                     }
                     while (!isBiz(cur)) cur = addDays(cur, 1);
-                    out = "Result date: " + toISO(cur);
+
+                    var out = "Result date: " + toISO(cur);
+                    if (customWarnings.length) out += "\n⚠ " + customWarnings.join("; ");
+                    resultEl.innerText = out;
+
                 } else {
-                    let a = new Date(
-                        document.getElementById("betweenStart").value,
-                    );
-                    let b = new Date(
-                        document.getElementById("betweenEnd").value,
-                    );
+                    var betweenStartInput = document.getElementById("betweenStart").value;
+                    var betweenEndInput = document.getElementById("betweenEnd").value;
+
+                    if (!betweenStartInput || !betweenEndInput) {
+                        resultEl.innerText = "Please enter both start and end dates.";
+                        return;
+                    }
+
+                    var a = new Date(betweenStartInput);
+                    var b = new Date(betweenEndInput);
+
+                    if (!isValidDate(a) || !isValidDate(b)) {
+                        resultEl.innerText = "Invalid date(s). Please use valid dates.";
+                        return;
+                    }
+
                     if (b < a) {
-                        let t = a;
+                        var t = a;
                         a = b;
                         b = t;
                     }
-                    let cur = new Date(a);
+
+                    rangeStart = a;
+                    rangeEnd = b;
+
+                    let hol = buildHolidaySet(rangeStart, rangeEnd);
+                    function isBiz(d) {
+                        return (
+                            !isWeekend(d) &&
+                            !hol.has(toISO(d)) &&
+                            !custom.has(toISO(d))
+                        );
+                    }
+
+                    var cur = new Date(a);
                     if (!include) cur = addDays(cur, 1);
-                    let cnt = 0;
+                    var cnt = 0;
                     while (cur <= b) {
                         if (isBiz(cur)) cnt++;
                         cur = addDays(cur, 1);
                     }
-                    out = "Business days between: " + cnt;
+
+                    var out = "Business days between: " + cnt;
+                    if (customWarnings.length) out += "\n⚠ " + customWarnings.join("; ");
+                    resultEl.innerText = out;
                 }
-                document.getElementById("result").innerText = out;
             }
 
             function copyResult() {
