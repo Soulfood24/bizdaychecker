@@ -6,5 +6,6 @@ window.SITE_CONFIG = {
   AD_SLOT_TOP: "",
   AD_SLOT_BOTTOM: "",
   SPONSOR_TEXT: "",
-  SPONSOR_HREF: ""
+  SPONSOR_HREF: "",
+  GA4_MEASUREMENT_ID: "G-XXXXXXXXXX" // TODO: Replace with real GA4 measurement ID
 };
