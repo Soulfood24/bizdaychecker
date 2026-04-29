@@ -212,6 +212,7 @@ input[type="checkbox"] {
 
 /* Adsense inline wrappers — collapse when no ad fills */
 .adsense-unit {
+  height: 0;
   min-height: 0;
   margin: 0;
   padding: 0;
@@ -219,6 +220,7 @@ input[type="checkbox"] {
 }
 
 .adsense-unit.active {
+  height: auto;
   margin: 24px 0;
 }
 
