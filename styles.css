@@ -10,7 +10,7 @@ body {
 }
 
 .wrap {
-  max-width: 960px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 16px;
 }
@@ -219,9 +219,23 @@ input[type="checkbox"] {
   overflow: hidden;
 }
 
+.adsense-unit ins,
+.adsense-unit iframe {
+  height: 0 !important;
+  max-height: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
 .adsense-unit.active {
   height: auto;
   margin: 24px 0;
+}
+
+.adsense-unit.active ins,
+.adsense-unit.active iframe {
+  height: auto !important;
+  max-height: none !important;
 }
 
 .is-off { display: none !important; }
@@ -338,3 +352,71 @@ input[type="checkbox"] {
 .holiday-table th{text-align:left;padding:0.4rem 0.6rem;border-bottom:2px solid #e5e7eb;font-weight:600;background:#f9fafb}
 .holiday-table td{padding:0.35rem 0.6rem;border-bottom:1px solid #f0f0f0}
 .holiday-table tr:last-child td{border-bottom:none}
+
+/* Support pages — layout shell matching index.html */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.page-copy {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin: 12px 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  line-height: 1.6;
+}
+
+.page-copy h1 {
+  margin: 0 0 10px;
+  font-size: 1.2rem;
+  color: #111;
+}
+
+.page-copy h2 {
+  margin: 14px 0 6px;
+  font-size: 1.05rem;
+  color: #222;
+}
+
+.page-copy h3 {
+  margin: 12px 0 4px;
+  font-size: 1rem;
+  color: #222;
+}
+
+.page-copy p {
+  margin: 0 0 8px;
+  color: #333;
+}
+
+.page-copy ul,
+.page-copy ol {
+  margin: 0 0 8px;
+  padding-left: 22px;
+  color: #333;
+}
+
+.page-copy li {
+  margin-bottom: 4px;
+}
+
+.page-copy a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.page-copy a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 0 16px;
+  }
+  .page-copy {
+    padding: 12px 14px;
+  }
+}
