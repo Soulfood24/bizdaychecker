@@ -1,60 +1,111 @@
 /* GA4 - Calc-HQ Network Analytics (single injection point) */
 (function(){if(!window.__GA4_LOADED){window.__GA4_LOADED=true;var id="G-W4SWZ1YRS2";var s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id="+id;document.head.appendChild(s);window.dataLayer=window.dataLayer||[];function gtag(){window.dataLayer.push(arguments);}gtag("js",new Date());gtag("config",id);}})();
 
-// assets/network.js — single source of truth for footer interlinks (ZERO-TOLERANCE)
-// Loads /assets/forbidden-domains.json and excludes those domains from related tools cluster.
-// Related tools must be rendered ONLY from this file. Current site excluded. Hub excluded.
+// network.js — single source of truth for footer related-tools rendering
+// Rules:
+//   1. Each site shows only calculators from its own cluster
+//   2. New calculators in the same cluster appear automatically
+//   3. Calculators outside the cluster are never shown
+//   4. Hub (calc-hq.com) and current site are always excluded
+//   5. Forbidden domains are always excluded
+//   6. No hardcoded related links in HTML — this file is the only renderer
 (function () {
   "use strict";
 
+  // ── Full portfolio with cluster tags ──────────────────────────────
   window.CALC_HQ_NETWORK = [
-    { name: "Calc-HQ",                     url: "https://calc-hq.com",              live: true },
-    { name: "BizDayChecker.com",           url: "https://bizdaychecker.com",        live: true },
-    { name: "BankCutoffChecker.com",       url: "https://bankcutoffchecker.com",    live: true },
-    { name: "SalaryVsInflation.com",       url: "https://salaryvsinflation.com",    live: true },
-    { name: "Hourly2SalaryCalc.com",       url: "https://hourly2salarycalc.com",    live: true },
-    { name: "PayrollDateChecker.com",      url: "https://payrolldatechecker.com",   live: true },
-    { name: "1099vsW2Calc.com",            url: "https://1099vsw2calc.com",         live: true },
-    { name: "FreelanceIncomeCalc.com",     url: "https://freelanceincomecalc.com",  live: true },
-    { name: "QuarterlyTaxCalc.com",        url: "https://quarterlytaxcalc.com",     live: true },
-    { name: "TotalCompCalc.com",           url: "https://totalcompcalc.com",        live: true },
-    { name: "OvertimePayCalc.com",         url: "https://overtimepaycalc.com",      live: true },
-    { name: "AfterTaxSalaryCalc.com",      url: "https://aftertaxsalarycalc.com",   live: true }
+    // Hub
+    { name: "Calc-HQ",                     url: "https://calc-hq.com",              live: true,  clusters: [] },
+
+    // US — Payroll / Timing cluster
+    { name: "BizDayChecker.com",           url: "https://bizdaychecker.com",        live: true,  clusters: ["us", "payroll-timing"] },
+    { name: "BankCutoffChecker.com",       url: "https://bankcutoffchecker.com",    live: true,  clusters: ["us", "payroll-timing"] },
+    { name: "PayrollDateChecker.com",      url: "https://payrolldatechecker.com",   live: true,  clusters: ["us", "payroll-timing"] },
+
+    // US — Tax / Income cluster
+    { name: "1099vsW2Calc.com",            url: "https://1099vsw2calc.com",         live: true,  clusters: ["us", "tax-income"] },
+    { name: "FreelanceIncomeCalc.com",     url: "https://freelanceincomecalc.com",  live: true,  clusters: ["us", "tax-income"] },
+    { name: "QuarterlyTaxCalc.com",        url: "https://quarterlytaxcalc.com",     live: true,  clusters: ["us", "tax-income"] },
+
+    // US — Compensation cluster
+    { name: "SalaryVsInflation.com",       url: "https://salaryvsinflation.com",    live: true,  clusters: ["us", "compensation"] },
+    { name: "Hourly2SalaryCalc.com",       url: "https://hourly2salarycalc.com",    live: true,  clusters: ["us", "compensation"] },
+    { name: "TotalCompCalc.com",           url: "https://totalcompcalc.com",        live: true,  clusters: ["us", "compensation"] },
+    { name: "OvertimePayCalc.com",         url: "https://overtimepaycalc.com",      live: true,  clusters: ["us", "compensation"] },
+    { name: "AfterTaxSalaryCalc.com",      url: "https://aftertaxsalarycalc.com",   live: true,  clusters: ["us", "compensation"] },
+
+    // Canada — Take-Home Pay cluster
+    { name: "OntarioTakeHomeCalc.com",     url: "https://ontariotakehomecalc.com",  live: true,  clusters: ["ca", "take-home"] },
+
+    // Canada — Payroll Deductions cluster
+    { name: "CPPCalc.com",                 url: "https://cppcalc.com",              live: true,  clusters: ["ca", "payroll-deductions"] },
+    { name: "EICalc.com",                  url: "https://eicalc.com",               live: true,  clusters: ["ca", "payroll-deductions"] }
   ];
 
   var FORBIDDEN = [];
+
+  // ── Helpers ───────────────────────────────────────────────────────
 
   function getCurrentDomain() {
     return window.location.hostname.replace(/^www\./, "").toLowerCase();
   }
 
+  function getHost(url) {
+    try { return new URL(url).hostname.replace(/^www\./, "").toLowerCase(); }
+    catch (e) { return ""; }
+  }
+
+  function getCurrentSite() {
+    var domain = getCurrentDomain();
+    for (var i = 0; i < window.CALC_HQ_NETWORK.length; i++) {
+      if (getHost(window.CALC_HQ_NETWORK[i].url) === domain) {
+        return window.CALC_HQ_NETWORK[i];
+      }
+    }
+    return null;
+  }
+
+  // ── Cluster-aware rendering ───────────────────────────────────────
+
   function renderRelatedTools() {
     var containers = document.querySelectorAll(".network-links");
     if (!containers.length) return;
-    var currentDomain = getCurrentDomain();
 
-    var sites = window.CALC_HQ_NETWORK.filter(function (site) {
+    var currentSite = getCurrentSite();
+    var currentDomain = getCurrentDomain();
+    var currentClusters = currentSite ? currentSite.clusters : [];
+
+    // Find sites that share at least one cluster with current site
+    var related = window.CALC_HQ_NETWORK.filter(function (site) {
       if (!site || site.live !== true) return false;
-      try {
-        var host = new URL(site.url).hostname.replace(/^www\./, "").toLowerCase();
-        if (host === "calc-hq.com") return false;
-        if (host === currentDomain) return false;
-        if (FORBIDDEN.indexOf(host) !== -1) return false;
-        return true;
-      } catch (e) {
-        return false;
+      var host = getHost(site.url);
+      if (host === "calc-hq.com") return false;        // never show hub
+      if (host === currentDomain) return false;          // never show self
+      if (FORBIDDEN.indexOf(host) !== -1) return false;  // never show forbidden
+
+      // Must share a sub-cluster (skip country tag like "us"/"ca")
+      // Country tags are for routing, not related-tool matching
+      if (!currentClusters.length) return false;
+      var countryTags = ["us", "ca"];
+      for (var i = 0; i < site.clusters.length; i++) {
+        var c = site.clusters[i];
+        if (countryTags.indexOf(c) !== -1) continue; // skip country tag
+        if (currentClusters.indexOf(c) !== -1) return true;
       }
+      return false;
     });
 
     containers.forEach(function (container) {
-      if (!sites.length) { container.innerHTML = ""; return; }
+      if (!related.length) { container.innerHTML = ""; return; }
       var html = "<strong>Related Tools:</strong> ";
-      html += sites.map(function (site) {
+      html += related.map(function (site) {
         return '<a href="' + site.url + '" target="_blank" rel="noopener">' + site.name + '</a>';
       }).join(" &nbsp;&bull;&nbsp; ");
       container.innerHTML = html;
     });
   }
+
+  // ── Forbidden domains loader ──────────────────────────────────────
 
   function loadForbiddenThenRender() {
     var xhr = new XMLHttpRequest();
