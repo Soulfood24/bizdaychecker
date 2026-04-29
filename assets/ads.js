@@ -43,4 +43,22 @@
 
   mountAd("adTop", cfg.AD_SLOT_TOP);
   mountAd("adBottom", cfg.AD_SLOT_BOTTOM);
+
+  // Detect if inline AdSense units actually filled — add .active only when ad renders
+  document.addEventListener("DOMContentLoaded", function () {
+    var units = document.querySelectorAll(".adsense-unit");
+    units.forEach(function (unit) {
+      var ins = unit.querySelector("ins.adsbygoogle");
+      if (!ins) return;
+      // Check after a short delay if the ins got dimensions (ad filled)
+      setTimeout(function () {
+        try {
+          var filled = ins.querySelector("iframe");
+          if (filled && filled.offsetWidth > 0) {
+            unit.classList.add("active");
+          }
+        } catch (e) {}
+      }, 2000);
+    });
+  });
 })();

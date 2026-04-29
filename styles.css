@@ -193,9 +193,33 @@ input[type="checkbox"] {
   margin-top: 12px;
 }
 
-/* Ad slots */
-.ad-slot {
-  margin: 16px 0;
+/* Ad slots — collapse when inactive */
+.ad-slot,
+.adsense-slot,
+.ad-container {
+  display: none;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.ad-slot.active,
+.adsense-slot.active,
+.ad-container.active {
+  display: block;
+  margin: 24px 0;
+}
+
+/* Adsense inline wrappers — collapse when no ad fills */
+.adsense-unit {
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.adsense-unit.active {
+  margin: 24px 0;
 }
 
 .is-off { display: none !important; }
@@ -247,8 +271,8 @@ input[type="checkbox"] {
 .content-section {
   background: #fff;
   border-radius: 12px;
-  padding: 24px 28px;
-  margin-top: 16px;
+  padding: 18px 22px;
+  margin-top: 12px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   line-height: 1.7;
 }
