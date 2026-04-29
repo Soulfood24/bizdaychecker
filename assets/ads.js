@@ -1,7 +1,14 @@
-// Ad/Sponsor rails: keep hidden unless explicitly activated in config.js
+// ads.js — standardized ad handling for Calc-HQ network
+// Rules:
+//   1. Ad slots stay hidden unless explicitly activated
+//   2. Inline AdSense units (.adsense-unit) collapse to height:0 when inactive
+//   3. .active is ONLY added when a real ad is visible (iframe ≥50px tall, ≥100px wide)
+//   4. Tracking iframes (0–13px) must NEVER trigger activation
+//   5. No delayed layout shift — inactive slots stay at zero height permanently
 (function () {
   var cfg = window.SITE_CONFIG || {};
 
+  // Sponsor slot
   var sponsor = document.getElementById("sponsor");
   if (sponsor) {
     if (cfg.SPONSOR_ACTIVE && cfg.SPONSOR_TEXT) {
@@ -16,6 +23,7 @@
     }
   }
 
+  // Config-driven ad slot mounting (#adTop, #adBottom)
   function mountAd(containerId, slotId) {
     var el = document.getElementById(containerId);
     if (!el) return;
@@ -48,7 +56,7 @@
   // Only activate when a REAL ad is confirmed — visible, measurable content.
   // An iframe alone is NOT sufficient. AdSense injects tracking iframes with
   // zero visual content that still report offsetWidth > 0.
-  // Safe default: do NOT activate at all unless a real ad is verifiable.
+  // Safe default: do NOT activate unless iframe is ≥50px tall AND ≥100px wide.
   document.addEventListener("DOMContentLoaded", function () {
     var units = document.querySelectorAll(".adsense-unit");
     units.forEach(function (unit) {
@@ -60,8 +68,7 @@
           var iframe = ins.querySelector("iframe");
           if (!iframe) return;
 
-          // Strict activation: iframe must have BOTH meaningful width AND height
-          // A real ad is at least 50px tall. Tracking iframes are 0–13px.
+          // Strict activation: real ads are at least 50px tall and 100px wide
           var ih = iframe.offsetHeight || 0;
           var iw = iframe.offsetWidth || 0;
 
