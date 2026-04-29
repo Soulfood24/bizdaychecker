@@ -44,21 +44,32 @@
   mountAd("adTop", cfg.AD_SLOT_TOP);
   mountAd("adBottom", cfg.AD_SLOT_BOTTOM);
 
-  // Detect if inline AdSense units actually filled — add .active only when ad renders
+  // Inline AdSense units (.adsense-unit):
+  // Only activate when a REAL ad is confirmed — visible, measurable content.
+  // An iframe alone is NOT sufficient. AdSense injects tracking iframes with
+  // zero visual content that still report offsetWidth > 0.
+  // Safe default: do NOT activate at all unless a real ad is verifiable.
   document.addEventListener("DOMContentLoaded", function () {
     var units = document.querySelectorAll(".adsense-unit");
     units.forEach(function (unit) {
       var ins = unit.querySelector("ins.adsbygoogle");
       if (!ins) return;
-      // Check after a short delay if the ins got dimensions (ad filled)
+
       setTimeout(function () {
         try {
-          var filled = ins.querySelector("iframe");
-          if (filled && filled.offsetWidth > 0) {
+          var iframe = ins.querySelector("iframe");
+          if (!iframe) return;
+
+          // Strict activation: iframe must have BOTH meaningful width AND height
+          // A real ad is at least 50px tall. Tracking iframes are 0–13px.
+          var ih = iframe.offsetHeight || 0;
+          var iw = iframe.offsetWidth || 0;
+
+          if (ih >= 50 && iw >= 100) {
             unit.classList.add("active");
           }
         } catch (e) {}
-      }, 2000);
+      }, 3000);
     });
   });
 })();
