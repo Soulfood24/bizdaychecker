@@ -22,7 +22,7 @@ header {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 16px 0 24px;
+  padding: 12px 0 16px;
 }
 
 .brand h1 {
@@ -69,12 +69,12 @@ nav a.active, nav a:hover {
 .card {
   background: #fff;
   border-radius: 12px;
-  padding: 24px;
+  padding: 18px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
 .card h2 {
-  margin: 0 0 16px;
+  margin: 0 0 10px;
   font-size: 1.1rem;
 }
 
@@ -83,7 +83,7 @@ nav a.active, nav a:hover {
 /* Form elements */
 label {
   font-weight: 600;
-  margin-top: 14px;
+  margin-top: 10px;
   display: block;
   font-size: 0.9rem;
 }
@@ -111,9 +111,9 @@ input[type="checkbox"] {
 /* Buttons */
 .btn, .btn-secondary {
   display: inline-block;
-  margin-top: 14px;
+  margin-top: 10px;
   margin-right: 8px;
-  padding: 12px 20px;
+  padding: 10px 18px;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
@@ -128,8 +128,8 @@ input[type="checkbox"] {
 
 /* Result */
 .result {
-  margin-top: 16px;
-  padding: 14px;
+  margin-top: 10px;
+  padding: 12px;
   background: #f0f7ff;
   border-radius: 8px;
   font-weight: 600;
@@ -138,7 +138,7 @@ input[type="checkbox"] {
 
 /* Footer */
 .foot {
-  margin-top: 32px;
+  margin-top: 20px;
   text-align: center;
   font-size: 0.85rem;
   color: #666;
@@ -183,14 +183,14 @@ input[type="checkbox"] {
 /* Separator */
 .sep {
   border-top: 1px solid #eee;
-  margin: 20px 0;
+  margin: 12px 0;
 }
 
 /* Mini text */
 .mini {
   font-size: 0.8rem;
   opacity: 0.7;
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
 /* Ad slots — collapse when inactive */
@@ -228,8 +228,8 @@ input[type="checkbox"] {
   background: #fffbe6;
   border: 1px solid #ffe58f;
   border-radius: 8px;
-  padding: 12px 16px;
-  margin: 10px 0 16px;
+  padding: 10px 14px;
+  margin: 8px 0 10px;
   font-size: 0.9rem;
   cursor: pointer;
 }
@@ -239,9 +239,9 @@ input[type="checkbox"] {
   background: #fffbe6;
   border: 1px solid #ffe58f;
   border-radius: 8px;
-  padding: 12px 16px;
-  margin-top: 10px;
-  margin-bottom: 16px;
+  padding: 10px 14px;
+  margin-top: 8px;
+  margin-bottom: 10px;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
@@ -271,38 +271,38 @@ input[type="checkbox"] {
 .content-section {
   background: #fff;
   border-radius: 12px;
-  padding: 18px 22px;
-  margin-top: 12px;
+  padding: 14px 18px;
+  margin-top: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
 .content-section h2 {
-  margin: 0 0 14px;
-  font-size: 1.15rem;
+  margin: 0 0 8px;
+  font-size: 1.1rem;
   color: #111;
 }
 
 .content-section h3 {
-  margin: 18px 0 6px;
+  margin: 12px 0 4px;
   font-size: 1rem;
   color: #222;
 }
 
 .content-section p {
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   color: #333;
 }
 
 .content-section ul,
 .content-section ol {
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   padding-left: 22px;
   color: #333;
 }
 
 .content-section li {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .content-section a {
@@ -316,13 +316,13 @@ input[type="checkbox"] {
 
 /* Legal pages */
 .card.legal h3 {
-  margin: 20px 0 6px;
+  margin: 14px 0 4px;
   font-size: 1rem;
 }
 
 .card.legal p, .card.legal ul {
   margin: 4px 0;
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
 .card.legal ul {
